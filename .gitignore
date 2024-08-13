@@ -2,6 +2,7 @@ tests/data
 examples/example_1/staging
 build/
 dist/
+.venv
 *.egg*
 __pycache__
 *_env
