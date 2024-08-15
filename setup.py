@@ -4,37 +4,35 @@ import setuptools  # type: ignore[import]
 import subprocess
 import sys
 
-subprocess.check_call(
-    [sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
 
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'wheel'])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "wheel"])
 
 try:
     from dunamai import Version
 except ImportError:
-    subprocess.check_call(
-            [sys.executable, '-m', 'pip', 'install', 'dunamai']
-    )
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "dunamai"])
     from dunamai import Version  # type: ignore[import]
 
 try:
     version = Version.from_any_vcs().serialize()
 except RuntimeError:
-    version = '0.0.0'
+    version = "0.0.0"
 except ValueError as e:
     if "time data '%cI' does not match format '%Y-%m-%dT%H:%M:%S%z'" in str(e):
-        version = '0.0.0'
+        version = "0.0.0"
     else:
         raise
+
 
 class BuildSchism(setuptools.Command):
 
     description = "build external SCHISM dependencies"
 
     user_options = [
-        ('url=', None, 'Path for git clone of SCHISM source.'),
-        ('branch=', None, 'Branch to use for install'),
-        ('hydro=', None, 'Branch to use for install')
+        ("url=", None, "Path for git clone of SCHISM source."),
+        ("branch=", None, "Branch to use for install"),
+        ("hydro=", None, "Branch to use for install"),
     ]
 
     def initialize_options(self):
@@ -43,9 +41,10 @@ class BuildSchism(setuptools.Command):
         self.hydro = None
 
     def finalize_options(self):
-        self.url = 'https://github.com/schism-dev/schism' if self.url is None \
-            else self.url
-        self.branch = 'master' if self.branch is None else self.branch
+        self.url = (
+            "https://github.com/schism-dev/schism" if self.url is None else self.url
+        )
+        self.branch = "master" if self.branch is None else self.branch
         self.hydro = True if self.hydro is None else bool(self.hydro)
 
     def run(self):
@@ -80,59 +79,62 @@ class BuildSchism(setuptools.Command):
         # subprocess.check_call(
         #   ["git", "submodule", "deinit", "-f", "submodules/jigsaw-python"])
 
+
 parent = pathlib.Path(__file__).parent.absolute()
-conf = setuptools.config.read_configuration(parent / 'setup.cfg')
-meta = conf['metadata']
+conf = setuptools.config.read_configuration(parent / "setup.cfg")
+meta = conf["metadata"]
 setuptools.setup(
-    name=meta['name'],
+    name=meta["name"],
     version=version,
-    author=meta['author'],
-    author_email=meta['author_email'],
-    description=meta['description'],
-    long_description=meta['long_description'],
+    author=meta["author"],
+    author_email=meta["author_email"],
+    description=meta["description"],
+    long_description=meta["long_description"],
     long_description_content_type="text/markdown",
-    url=meta['url'],
-    packages=setuptools.find_packages(exclude=['tests', 'examples', 'docs', 'docker']),
-    python_requires='>=3.8',
-    setup_requires=['wheel', 'setuptools_scm', 'setuptools>=41.2',
-                    'netcdf-flattener>=1.2.0'],
-    include_package_data=True,
-    extras_require={'dev': ['coverage', 'flake8', 'nose']},
-    cmdclass={
-        "build_schism": BuildSchism
-    },
-    install_requires=[
-        'boto3',
-        'cdsapi',
-        'cf-python',
-        'cfgrib',
-        'f90nml',
-        'fsspec',
-        'geopandas',
-        'metpy',
-        'netCDF4',
-        'netcdf-flattener>=1.2.0',
-        'numba',
-        'ordered-set',
-        'psutil',
-        'pyugrid',
-        'rtree',
-        'scipy',
-        'seawater',
-        'shapely>=2.0.5,<3.0.0',
-        'sqlalchemy',
-        'stormevents',
-        'tqdm',
-        'tqdm-logging-wrapper',
-        'utm',
-        'wget',
-        'xarray',
-        'xmltodict',
-        'zarr',
-        'appdirs',
-        'pylib-essentials',
+    url=meta["url"],
+    packages=setuptools.find_packages(exclude=["tests", "examples", "docs", "docker"]),
+    python_requires=">=3.8",
+    setup_requires=[
+        "wheel",
+        "setuptools_scm",
+        "setuptools>=41.2",
+        "netcdf-flattener>=1.2.0",
     ],
-    entry_points={'console_scripts': ['pyschism = pyschism.__main__:main']},
-    tests_require=['nose'],
-    test_suite='nose.collector',
+    include_package_data=True,
+    extras_require={"dev": ["coverage", "flake8", "nose"]},
+    cmdclass={"build_schism": BuildSchism},
+    install_requires=[
+        "boto3",
+        "cdsapi",
+        "cf-python",
+        "cfgrib",
+        "f90nml",
+        "fsspec",
+        "geopandas",
+        "gsw",
+        "metpy",
+        "netCDF4",
+        "netcdf-flattener>=1.2.0",
+        "numba",
+        "ordered-set",
+        "psutil",
+        "pyugrid",
+        "rtree",
+        "scipy",
+        "shapely>=2.0.5,<3.0.0",
+        "sqlalchemy",
+        "stormevents",
+        "tqdm",
+        "tqdm-logging-wrapper",
+        "utm",
+        "wget",
+        "xarray",
+        "xmltodict",
+        "zarr",
+        "appdirs",
+        "pylib-essentials",
+    ],
+    entry_points={"console_scripts": ["pyschism = pyschism.__main__:main"]},
+    tests_require=["nose"],
+    test_suite="nose.collector",
 )
