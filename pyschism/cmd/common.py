@@ -1,17 +1,14 @@
 import argparse
 from datetime import datetime, timedelta
 from enum import Enum
-import json
 import logging
 import sys
 from time import time
 
-import numpy as np
-
 from pyschism import dates
 from pyschism.enums import Stratification, Sflux1Types, Sflux2Types
 from pyschism.mesh import Hgrid, Vgrid, gridgr3
-from pyschism.forcing import nws, bctides, hycom, source_sink
+from pyschism.forcing import nws, source_sink
 from pyschism.utils.timedeltatype import TimeDeltaType
 
 
@@ -263,12 +260,12 @@ def add_tidal_database_to_parser(parser):
 #     class BaroclinicDatabases(Enum):
 #         RTOFS = hycom.RTOFS
 #         GOFS = hycom.GOFS
-# 
+#
 #     class BaroclinicDatabaseAction(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
-# 
+#
 #             setattr(namespace, self.dest, values)
-# 
+#
 #     hycom_group = parser.add_argument_group("HYCOM options")
 #     # *************************************************************************************************
 #     hycom_group.add_argument(
@@ -319,7 +316,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #             for key, val in values.items():
 #                 values.update({key: self.iettype(int(key), val)})
 #             setattr(namespace, self.dest, values)
-# 
+#
 #         def iettype(self, key, value):
 #             values = [1, 2, 3, 4, 5, -1]
 #             assert value in values, (
@@ -328,7 +325,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #             raise NotImplementedError(
 #                 "Per-boundary specification not yet " "supported."
 #             )
-# 
+#
 #     class Iettype3Action(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
 #             tmp_parser = argparse.ArgumentParser(add_help=False)
@@ -342,7 +339,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                     constituents=tmp_args.constituents, database=tmp_args.tidal_database
 #                 ),
 #             )
-# 
+#
 #     class Iettype4Action(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
 #             if not bool(set(sys.argv).intersection(["-h", "--help"])):
@@ -352,7 +349,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                 add_baroclinic_database_to_parser(tmp_parser)
 #                 tmp_args = tmp_parser.parse_known_args()[0]
 #                 setattr(namespace, self.dest, self.const(tmp_args.baroclinic_database))
-# 
+#
 #     class Iettype5Action(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
 #             if not bool(set(sys.argv).intersection(["-h", "--help"])):
@@ -370,7 +367,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                     data_source=tmp_args.baroclinic_database
 #                 )
 #                 setattr(namespace, self.dest, self.const(iettype3, iettype4))
-# 
+#
 #     iettype_group = parser.add_argument_group(
 #         "Elevation boundary condition options"
 #     ).add_mutually_exclusive_group()
@@ -399,7 +396,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #         type=bctides.iettype.Iettype2,
 #         help="Global constant elevation option.",
 #     )
-# 
+#
 #     iettype_group.add_argument(
 #         "--iettype-3",
 #         "--harmonic-tidal-elevation",
@@ -409,7 +406,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #         action=Iettype3Action,
 #         help="Enables tidal elevation harmonic forcing.",
 #     )
-# 
+#
 #     iettype_group.add_argument(
 #         "--iettype-4",
 #         "--subtidal-elevation",
@@ -420,7 +417,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #         action=Iettype4Action,
 #         help="Enables subtidal elevation forcing.",
 #     )
-# 
+#
 #     iettype_group.add_argument(
 #         "--iettype-5",
 #         "--subtidal-and-tidal-elevation",
@@ -431,7 +428,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #         help="Enables the combined elevation tidal harmonic forcing and "
 #         "subtidal elevation forcing.",
 #     )
-# 
+#
 #     iettype_group.add_argument(
 #         "--iettype--1",
 #         "--zero-elevation",
@@ -440,8 +437,8 @@ def get_per_boundary_help_message(varname, ibctype):
 #         action="store_const",
 #         help="Zero elevation at boundaries. (Not implemented)",
 #     )
-# 
-# 
+#
+#
 # def add_ifltype_to_parser(parser):
 #     class IfltypeAction(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
@@ -449,7 +446,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #             for key, val in values.items():
 #                 values.update({key: self.iettype(int(key), val)})
 #             setattr(namespace, self.dest, values)
-# 
+#
 #         def ifltype(self, key, value):
 #             values = [1, 2, 3, 4, 5, -1]
 #             assert value in values, (
@@ -458,7 +455,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #             raise NotImplementedError(
 #                 "Per-boundary specification not yet " "supported."
 #             )
-# 
+#
 #     class Ifltype3Action(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
 #             tmp_parser = argparse.ArgumentParser(add_help=False)
@@ -473,7 +470,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                     database=tmp_args.tidal_database,
 #                 ),
 #             )
-# 
+#
 #     class Ifltype4Action(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
 #             if not bool(set(sys.argv).intersection(["-h", "--help"])):
@@ -483,7 +480,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                 add_baroclinic_database_to_parser(tmp_parser)
 #                 tmp_args = tmp_parser.parse_known_args()[0]
 #                 setattr(namespace, self.dest, self.const(tmp_args.baroclinic_database))
-# 
+#
 #     class Ifltype5Action(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
 #             if not bool(set(sys.argv).intersection(["-h", "--help"])):
@@ -501,7 +498,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                     data_source=tmp_args.baroclinic_database
 #                 )
 #                 setattr(namespace, self.dest, self.const(ifltype3, ifltype4))
-# 
+#
 #     ifltype_group = parser.add_argument_group(
 #         "Velocity boundary condition options"
 #     ).add_mutually_exclusive_group()
@@ -538,7 +535,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #         action=Ifltype3Action,
 #         help="Enables tidal velocity harmonic forcing.",
 #     )
-# 
+#
 #     ifltype_group.add_argument(
 #         "--ifltype-4",
 #         "--subtidal-velocity",
@@ -548,7 +545,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #         action=Ifltype4Action,
 #         help="Enables subtidal velocity forcing.",
 #     )
-# 
+#
 #     ifltype_group.add_argument(
 #         "--ifltype-5",
 #         "--subtidal-and-tidal-velocity",
@@ -559,7 +556,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #         help="Enables the combined velocity tidal harmonic forcing and "
 #         "subtidal velocity forcing.",
 #     )
-# 
+#
 #     ifltype_group.add_argument(
 #         "--ifltype--1",
 #         "--uv-zero",
@@ -568,8 +565,8 @@ def get_per_boundary_help_message(varname, ibctype):
 #         dest="ifltype",
 #         # const=ifltype.Ifltype_1,
 #     )
-# 
-# 
+#
+#
 # def add_itetype_to_parser(parser):
 #     def get_nudge_bnds(namespace):
 #         tmp_parser = argparse.ArgumentParser(add_help=False)
@@ -603,7 +600,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                 f.append(bnd)
 #             raise ValueError(" ".join(f))
 #         return tmp_args.nudge_temp
-# 
+#
 #     class Itetype4Action(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
 #             tmp_parser = argparse.ArgumentParser(add_help=False)
@@ -617,7 +614,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                     rnu_day=tmp_args.rnu_day_temp,
 #                 )
 #                 setattr(namespace, self.dest, itetype4)
-# 
+#
 #     itetype_group = parser.add_argument_group(
 #         "Temperature boundary condition options"
 #     ).add_mutually_exclusive_group()
@@ -640,14 +637,14 @@ def get_per_boundary_help_message(varname, ibctype):
 #         dest="itetype",
 #         # type=itetype.Itetype2
 #     )
-# 
+#
 #     itetype_group.add_argument(
 #         "--itetype-3",
 #         "--temperature-initial-condition",
 #         dest="itetype",
 #         # type=itetype.Itetype3,
 #     )
-# 
+#
 #     itetype_group.add_argument(
 #         "--itetype-4",
 #         "--temp-3d",
@@ -656,8 +653,8 @@ def get_per_boundary_help_message(varname, ibctype):
 #         nargs=0,
 #         const=bctides.itetype.Itetype4,
 #     )
-# 
-# 
+#
+#
 # def add_isatype_to_parser(parser):
 #     def get_nudge_bnds(namespace):
 #         tmp_parser = argparse.ArgumentParser(add_help=False)
@@ -691,7 +688,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                 f.append(bnd)
 #             raise ValueError(" ".join(f))
 #         return tmp_args.nudge_salt
-# 
+#
 #     class Isatype4Action(argparse.Action):
 #         def __call__(self, parser, namespace, values, option_string=None):
 #             tmp_parser = argparse.ArgumentParser(add_help=False)
@@ -705,7 +702,7 @@ def get_per_boundary_help_message(varname, ibctype):
 #                     rnu_day=tmp_args.rnu_day_salt,
 #                 )
 #                 setattr(namespace, self.dest, isatype4)
-# 
+#
 #     isatype_group = parser.add_argument_group(
 #         "Salinity boundary condition options"
 #     ).add_mutually_exclusive_group()
@@ -728,14 +725,14 @@ def get_per_boundary_help_message(varname, ibctype):
 #         dest="isatype",
 #         # type=isatype.Isatype2
 #     )
-# 
+#
 #     isatype_group.add_argument(
 #         "--isatype-3",
 #         # "--salt-ic",
 #         dest="isatype",
 #         # type=isatype.Isatype3,
 #     )
-# 
+#
 #     isatype_group.add_argument(
 #         "--isatype-4",
 #         "--salt-3d",
@@ -744,8 +741,8 @@ def get_per_boundary_help_message(varname, ibctype):
 #         nargs=0,
 #         const=bctides.isatype.Isatype4,
 #     )
-# 
-# 
+#
+#
 # class NudgeAction(argparse.Action):
 #     def __call__(self, parser, namespace, values, option_string=None):
 #         nudge = {}
@@ -760,8 +757,8 @@ def get_per_boundary_help_message(varname, ibctype):
 #             if len(nudge) == 0:
 #                 nudge = True
 #         setattr(namespace, self.dest, nudge)
-# 
-# 
+#
+#
 # def add_temperature_nudge_to_parser(parser):
 #     temp_group = parser.add_argument_group("Nudge options for temperature")
 #     nudge_parser = temp_group.add_mutually_exclusive_group()
@@ -798,8 +795,8 @@ def get_per_boundary_help_message(varname, ibctype):
 #     temp_group.set_defaults(nudge_temp=None)
 #     temp_group.add_argument("--rlmax-temp", default=1.5, type=float)
 #     temp_group.add_argument("--rnu_day-temp", default=0.25, type=float)
-# 
-# 
+#
+#
 # def add_salinity_nudge_to_parser(parser):
 #     salt_group = parser.add_argument_group("Nudge options for salinity")
 #     salt_group.add_argument(
@@ -821,13 +818,13 @@ def get_per_boundary_help_message(varname, ibctype):
 #     salt_group.set_defaults(nudge_salt=None)
 #     salt_group.add_argument("--rlmax-salt", default=1.5, type=float)
 #     salt_group.add_argument("--rnu_day-salt", default=0.25, type=float)
-# 
-# 
+#
+#
 # def add_nudge_to_parser(parser):
 #     add_temperature_nudge_to_parser(parser)
 #     add_salinity_nudge_to_parser(parser)
-# 
-# 
+#
+#
 # def add_ibctype_to_parser(parser):
 #     add_iettype_to_parser(parser)
 #     add_ifltype_to_parser(parser)
@@ -835,8 +832,8 @@ def get_per_boundary_help_message(varname, ibctype):
 #     add_isatype_to_parser(parser)
 #     # add_itrtype_to_parser(parser)
 #     add_nudge_to_parser(parser)
-# 
-# 
+#
+#
 # def add_windrot_to_parser(parser):
 #     parser.add_argument(
 #         "--windrot",
@@ -892,7 +889,7 @@ def add_sflux_to_parser(parser):
         metavar="sflux_level",
     )
     add_sflux_options_to_parser(parser)
-    #add_windrot_to_parser(parser)
+    # add_windrot_to_parser(parser)
 
 
 def add_nws_to_parser(parser):
@@ -912,7 +909,7 @@ def add_nws_to_parser(parser):
         metavar="sflux_level",
     )
     add_sflux_options_to_parser(parser)
-    #add_windrot_to_parser(parser)
+    # add_windrot_to_parser(parser)
     nws_parser.add_argument(
         "--nws-3",
         dest="nws",

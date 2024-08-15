@@ -1,7 +1,6 @@
 import argparse
 from datetime import timedelta
 from enum import Enum
-import logging
 import pathlib
 from pyschism.server.slurm import SlurmConfig
 
@@ -14,7 +13,6 @@ from pyschism.mesh import gridgr3, prop
 from pyschism.param.schout import SurfaceOutputVars
 from pyschism.server import ServerConfig, SlurmConfig
 
-logger = logging.getLogger(__name__)
 
 CONFIG_FILE_NAME = "config.json"
 STATIC_DIRECTORY = "static"
@@ -302,10 +300,10 @@ def add_forecast_init_to_parser(parser):
     common.add_gridgr3_to_parser(parser)
     common.add_ic_to_parser(parser)
     common.add_prop_to_parser(parser)
-    #common.add_ibctype_to_parser(parser)
+    # common.add_ibctype_to_parser(parser)
     common.add_tidal_constituents_to_parser(parser)
     common.add_tidal_database_to_parser(parser)
-    #common.add_baroclinic_database_to_parser(parser)
+    # common.add_baroclinic_database_to_parser(parser)
     common.add_bctides_options_to_parser(parser)
     common.add_nws_to_parser(parser)
     common.add_source_sink_to_parser(parser)

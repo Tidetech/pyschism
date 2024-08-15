@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-import logging
 
 import pathlib
 from typing import Union
@@ -10,9 +9,6 @@ import f90nml
 
 from pyschism import dates
 from pyschism.mesh.fgrid import NchiType
-
-
-logger = logging.getLogger(__name__)
 
 
 # class FlagIcDescriptor:
@@ -41,7 +37,7 @@ logger = logging.getLogger(__name__)
 class OptMeta(type):
     def __new__(meta, name, bases, attrs):
 
-        PARAM_DEFAULTS = f90nml.read(pathlib.Path(__file__).parent / 'param.nml')["opt"]
+        PARAM_DEFAULTS = f90nml.read(pathlib.Path(__file__).parent / "param.nml")["opt"]
         for key, value in PARAM_DEFAULTS.items():
             if key not in attrs:
                 if isinstance(value, list):
@@ -88,7 +84,7 @@ class OPT(metaclass=OptMeta):
 
     def __str__(self):
         data = []
-        PARAM_DEFAULTS = f90nml.read(pathlib.Path(__file__).parent / 'param.nml')["opt"]
+        PARAM_DEFAULTS = f90nml.read(pathlib.Path(__file__).parent / "param.nml")["opt"]
         for key, _ in PARAM_DEFAULTS.items():
             current = getattr(self, key)
             if current is not None:
@@ -103,7 +99,7 @@ class OPT(metaclass=OptMeta):
 
     def to_dict(self):
         data = {}
-        PARAM_DEFAULTS = f90nml.read(pathlib.Path(__file__).parent / 'param.nml')["opt"]
+        PARAM_DEFAULTS = f90nml.read(pathlib.Path(__file__).parent / "param.nml")["opt"]
         for key, _ in PARAM_DEFAULTS.items():
             current = getattr(self, key)
             if current is not None:

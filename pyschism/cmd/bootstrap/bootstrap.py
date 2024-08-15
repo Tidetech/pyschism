@@ -1,8 +1,6 @@
 import argparse
 import logging
 
-from pyschism.cmd import common
-
 
 class BootstrapCli:
 
@@ -11,7 +9,7 @@ class BootstrapCli:
 
     @staticmethod
     def add_subparser_action(subparsers):
-        add_bootstrap_options_to_parser(subparsers.add_parser('bootstrap'))
+        add_bootstrap_options_to_parser(subparsers.add_parser("bootstrap"))
 
     @property
     def args(self):
@@ -25,16 +23,12 @@ class BootstrapCli:
 
 def add_bootstrap_options_to_parser(parser):
     parser.add_argument(
-        'project_directory',
-        help='Directory where project files will be written to.',
+        "project_directory",
+        help="Directory where project files will be written to.",
     )
+    parser.add_argument("hgrid", help="Path to the SCHISM hgrid file.")
     parser.add_argument(
-        "hgrid",
-        help='Path to the SCHISM hgrid file.'
-    )
-    parser.add_argument(
-        '--hgrid-crs',
-        help='Coordinate reference system string of hgrid.'
+        "--hgrid-crs", help="Coordinate reference system string of hgrid."
     )
     parser.add_argument(
         "--vgrid",
@@ -44,25 +38,22 @@ def add_bootstrap_options_to_parser(parser):
         choices=[name.lower() for name in logging._nameToLevel],
         default="warning",
     )
-    parser.add_argument('--overwrite', action='store_true')
+    parser.add_argument("--overwrite", action="store_true")
     parser.add_argument(
-        '--tides',
-        '--tidal-database',
-        choices=['hamtide', 'tpxo'],
-        default='hamtide',
-        dest='tidal_database'
+        "--tides",
+        "--tidal-database",
+        choices=["hamtide", "tpxo"],
+        default="hamtide",
+        dest="tidal_database",
     )
     parser.add_argument(
-        '--hycom',
-        '--baroclinic-database',
-        choices=['rtofs', 'gofs'],
-        dest='baroclinic_database',
-        default='gofs',
+        "--hycom",
+        "--baroclinic-database",
+        choices=["rtofs", "gofs"],
+        dest="baroclinic_database",
+        default="gofs",
     )
-    parser.add_argument(
-        '--include-velocity',
-        action='store_true'
-    )
-    parser.add_argument('--Z0', type=float)
+    parser.add_argument("--include-velocity", action="store_true")
+    parser.add_argument("--Z0", type=float)
     parser.add_argument("--cutoff-depth", type=float, default=50.0)
-    #common.add_ibctype_to_parser(parser)
+    # common.add_ibctype_to_parser(parser)

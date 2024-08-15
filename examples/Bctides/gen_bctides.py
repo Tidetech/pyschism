@@ -1,8 +1,5 @@
-from time import time
-import os
 import argparse
-from datetime import datetime, timedelta
-import logging
+from datetime import datetime
 import json
 
 import numpy as np
@@ -14,11 +11,6 @@ from pyschism.forcing.bctides import Bctides
 #os.environ['TPXO_ELEVATION'] = '/path-to-your-hfile/h_tpxo9.v1.nc'
 #os.environ['TPXO_VELOCITY'] = '/path-to-your-ufile/u_tpxo9.v1.nc'
 
-logging.basicConfig(
-    format = "[%(asctime)s] %(name)s %(levelname)s: %(message)s",
-    force=True,
-)
-logging.getLogger("pyschism").setLevel(logging.DEBUG)
 
 def list_of_strings(arg):
     return arg.split(',')

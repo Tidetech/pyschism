@@ -1,45 +1,38 @@
 import argparse
-from datetime import datetime, timedelta
-import logging
 import pathlib
 
 from pyschism.cmd import common
 from pyschism.forcing.bctides import Bctides
 
 
-logger = logging.getLogger(__name__)
-
-
 class BctidesCli:
     def __init__(self, args: argparse.Namespace):
         Bctides(
-                args.hgrid,
-                vgrid=args.vgrid,
-                iettype=args.iettype,
-                ifltype=args.ifltype,
-                isatype=args.isatype,
-                itetype=args.itetype,
-                # itrtype=args.itrtype,
-                cutoff_depth=args.cutoff_depth,
-            ).write(
-                args.output_directory,
-                args.start_date,
-                args.end_date,
-                overwrite=args.overwrite,
-                parallel_download=args.parallel_download
+            args.hgrid,
+            vgrid=args.vgrid,
+            iettype=args.iettype,
+            ifltype=args.ifltype,
+            isatype=args.isatype,
+            itetype=args.itetype,
+            # itrtype=args.itrtype,
+            cutoff_depth=args.cutoff_depth,
+        ).write(
+            args.output_directory,
+            args.start_date,
+            args.end_date,
+            overwrite=args.overwrite,
+            parallel_download=args.parallel_download,
         )
 
     @staticmethod
     def add_subparser_action(subparsers):
-        add_bctides_options_to_parser(subparsers.add_parser('bctides'))
+        add_bctides_options_to_parser(subparsers.add_parser("bctides"))
 
 
 def add_bctides_options_to_parser(parser):
     common.add_hgrid_to_parser(parser)
     parser.add_argument(
-        "--overwrite",
-        action="store_true",
-        help="Allow overwrite of output files."
+        "--overwrite", action="store_true", help="Allow overwrite of output files."
     )
     common.add_log_level_to_parser(parser)
     common.add_dates_to_parser(parser)
@@ -62,19 +55,14 @@ def add_bctides_options_to_parser(parser):
     #     type=lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S"),
     #     # help=''
     # )
-    parser.add_argument(
-        "--output-directory",
-        "-o",
-        type=pathlib.Path,
-        required=True
-    )
+    parser.add_argument("--output-directory", "-o", type=pathlib.Path, required=True)
     common.add_vgrid_to_parser(parser)
     common.add_tidal_constituents_to_parser(parser)
     common.add_tidal_database_to_parser(parser)
-    #common.add_baroclinic_database_to_parser(parser)
+    # common.add_baroclinic_database_to_parser(parser)
     common.add_bctides_options_to_parser(parser)
-    #common.add_ibctype_to_parser(parser)
-    #parser.add_argument("--parallel-download", action='store_true')
+    # common.add_ibctype_to_parser(parser)
+    # parser.add_argument("--parallel-download", action='store_true')
 
 
 #     add_nudge_to_parser(parser)
@@ -82,7 +70,7 @@ def add_bctides_options_to_parser(parser):
 
 # class NudgeAction(argparse.Action):
 #     def __call__(self, parser, namespace, values, option_string=None):
-        
+
 #         if len(values) == 0:
 #             values = None
 
@@ -271,7 +259,7 @@ def add_bctides_options_to_parser(parser):
 #                     ))
 #             if boundary.id in tmp_args.nudge_temp:
 #                 namespace.hgrid.boundaries.open.loc[boundary.Index].itetype.nudge = True
-#                 namespace.hgrid.boundaries.open.loc[boundary.Index].itetype.rlmax = tmp_args.rlmax_temp               
+#                 namespace.hgrid.boundaries.open.loc[boundary.Index].itetype.rlmax = tmp_args.rlmax_temp
 #                 namespace.hgrid.boundaries.open.loc[boundary.Index].itetype.rnu_day = tmp_args.rnu_day_temp
 #             else:
 #                 namespace.hgrid.boundaries.open.loc[boundary.Index].itetype.nudge = False
@@ -306,7 +294,7 @@ def add_bctides_options_to_parser(parser):
 #                     namespace.baroclinic_database]()))
 #             if boundary.id in tmp_args.nudge_salt:
 #                 namespace.hgrid.boundaries.open.loc[boundary.Index].isatype.nudge = True
-#                 namespace.hgrid.boundaries.open.loc[boundary.Index].isatype.rlmax = tmp_args.rlmax_salt               
+#                 namespace.hgrid.boundaries.open.loc[boundary.Index].isatype.rlmax = tmp_args.rlmax_salt
 #                 namespace.hgrid.boundaries.open.loc[boundary.Index].isatype.rnu_day = tmp_args.rnu_day_salt
 #             else:
 #                 namespace.hgrid.boundaries.open.loc[boundary.Index].isatype.nudge = False

@@ -1,6 +1,5 @@
 from datetime import timedelta
 from typing import Union
-import logging
 import pathlib
 import tempfile
 
@@ -12,10 +11,8 @@ from pyschism.param.core import CORE
 from pyschism.param.opt import OPT
 from pyschism.param.schout import SCHOUT
 from pyschism.param import schism_init
+
 # from pyschism.stations import Stations
-
-
-logger = logging.getLogger(__name__)
 
 
 class Param:
@@ -47,10 +44,16 @@ class Param:
         if path.is_file() and not overwrite:
             raise IOError(f"File {path} exists and overwrite=False")
         if use_template:
-            PARAM_TEMPLATE = pathlib.Path(__file__).parent / 'param.nml' if use_template is True else use_template
-            schism_param_sample = schism_init.read_schism_param_sample_patched(PARAM_TEMPLATE)
+            PARAM_TEMPLATE = (
+                pathlib.Path(__file__).parent / "param.nml"
+                if use_template is True
+                else use_template
+            )
+            schism_param_sample = schism_init.read_schism_param_sample_patched(
+                PARAM_TEMPLATE
+            )
             tmpfile = tempfile.NamedTemporaryFile()
-            with open(tmpfile.name, 'w') as fh:
+            with open(tmpfile.name, "w") as fh:
                 fh.write(schism_param_sample)
             f90nml.patch(tmpfile.name, self.to_dict(), path)
         else:

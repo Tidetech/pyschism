@@ -1,22 +1,19 @@
 #! /usr/bin/env python
 import pathlib
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import logging
 from time import time
 
 from pyschism.mesh import Hgrid, Vgrid, Fgrid
-from pyschism import ModelDomain, ModelDriver, Stations
+from pyschism import ModelDomain, ModelDriver
 from pyschism.forcing import Tides
 from pyschism.forcing.atmosphere.nws.nws2 import NWS2
 from pyschism.forcing.atmosphere.gfs import GlobalForecastSystem as GFS
 
-#logging.basicConfig(filename='test.log',
-#                    level=logging.INFO, 
-#                    format='%(asctime)s:%(levelnames'
-#                   )
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
 
 SIMPLE_SLURM_DRIVER = """#!/bin/bash --login
 #SBATCH -D .
@@ -48,24 +45,24 @@ main
 PARENT = pathlib.Path(__file__).parent
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # open gr3 file
-    logger.info('Reading hgrid file...')
+    logger.info("Reading hgrid file...")
     _tic = time()
-    hgrid = Hgrid.open(PARENT / 'hgrid.gr3',crs='EPSG:4326')
-    logger.info(f'Reading hgrind file took {time()-_tic}.')
+    hgrid = Hgrid.open(PARENT / "hgrid.gr3", crs="EPSG:4326")
+    logger.info(f"Reading hgrind file took {time()-_tic}.")
 
     vgrid = Vgrid()
-    fgrid = Fgrid.open(PARENT / 'drag.gr3',crs='EPSG:4326')
+    fgrid = Fgrid.open(PARENT / "drag.gr3", crs="EPSG:4326")
 
     # setup model domain
     domain = ModelDomain(hgrid, vgrid, fgrid)
-    logger.info('Model domain setup finished')
+    logger.info("Model domain setup finished")
 
     # set tidal boundary conditions
     elevbc = Tides()
     elevbc.use_all()  # activate all forcing constituents
-    logger.info('Tidal boundary setup finished')
+    logger.info("Tidal boundary setup finished")
 
     # connect the boundary condition to the domain
     domain.add_boundary_condition(elevbc)
@@ -74,9 +71,9 @@ if __name__ == '__main__':
     # sflux_2 = HWRF()
 
     atmos = NWS2(
-             sflux_1,
-    #         sflux_2
-         )
+        sflux_1,
+        #         sflux_2
+    )
 
     domain.set_atmospheric_forcing(atmos)
 
@@ -85,12 +82,12 @@ if __name__ == '__main__':
 
     # Use int or float for seconds, or timedelta objects for pythonic
     # specifications
-    dt = timedelta(seconds=150.)
-    rnday = timedelta(days=4.)
+    dt = timedelta(seconds=150.0)
+    rnday = timedelta(days=4.0)
 
     # Use an integer for number of steps or a timedelta to approximate
     # number of steps internally based on timestep
-    nspool = timedelta(minutes=30.)
+    nspool = timedelta(minutes=30.0)
 
     # The dramp and start_date are optional parameters.
     # start_date is required when using forcings that
@@ -104,13 +101,20 @@ if __name__ == '__main__':
     start_date = datetime.utcnow() - dramp
 
     # Now we add station outputs
-#    stations = Stations.from_file(PARENT / 'station.in', timedelta(minutes=6.),
-#                                  elev=True, u=True, v=True)
+    #    stations = Stations.from_file(PARENT / 'station.in', timedelta(minutes=6.),
+    #                                  elev=True, u=True, v=True)
 
     # init the model driver
-    driver = ModelDriver(domain, dt, rnday, dramp=dramp, start_date=start_date,
-                         #stations=stations, nspool=nspool, elev=True)
-                         nspool=nspool, elev=True)
+    driver = ModelDriver(
+        domain,
+        dt,
+        rnday,
+        dramp=dramp,
+        start_date=start_date,
+        # stations=stations, nspool=nspool, elev=True)
+        nspool=nspool,
+        elev=True,
+    )
 
     # Output requests, as well as most other namelist variables, can be
     # modified post instantiation through their corresponding properties.
@@ -119,6 +123,5 @@ if __name__ == '__main__':
     driver.param.schout.dahv = True
 
     # write files to disk
-    outdir = pathlib.Path('staging')
+    outdir = pathlib.Path("staging")
     driver.write(outdir, overwrite=True)
-

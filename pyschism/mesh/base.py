@@ -17,7 +17,6 @@ from matplotlib.transforms import Bbox
 import numpy as np
 from pyproj import Transformer, CRS
 import requests
-from shapely import ops
 from shapely.geometry import (
     box,
     LinearRing,
@@ -69,8 +68,8 @@ class Nodes:
             del self._gdf
 
     def transform_to_cpp(self, lonc, latc):
-        longitude = list(self.coord[:, 0]/180*np.pi)
-        latitude = list(self.coord[:, 1]/180*np.pi)
+        longitude = list(self.coord[:, 0] / 180 * np.pi)
+        latitude = list(self.coord[:, 1] / 180 * np.pi)
         radius = 6378206.4
         loncc = lonc / 180 * np.pi
         latcc = latc / 180 * np.pi
@@ -248,12 +247,12 @@ class Elements:
         return self.gdf.loc[eidxs].geometry.unary_union.exterior
 
     def get_node_ball(self):
-        '''
+        """
         compute nodal ball information
-        '''
+        """
         elnode = self.array
         NP = len(self.nodes.values)
-        nne = np.zeros(NP).astype('int')
+        nne = np.zeros(NP).astype("int")
         ine = [[] for i in np.arange(NP)]
         mask = np.any(elnode.mask)
         for i, element in enumerate(elnode):
@@ -263,9 +262,9 @@ class Elements:
             else:
                 i34 = len(ele[0])
             inds = elnode[i, :i34]
-            nne[inds] = nne[inds]+1
+            nne[inds] = nne[inds] + 1
             [ine[indi].append(i) for indi in inds]
-        ine = np.array([np.array(ine[i]) for i in np.arange(NP)], dtype='O') 
+        ine = np.array([np.array(ine[i]) for i in np.arange(NP)], dtype="O")
         return nne, ine
 
     def compute_centroid(self):
@@ -277,12 +276,12 @@ class Elements:
 
         if np.any(elnode.mask):
             mask = elnode.mask[:, -1]
-            #centroid for tris 
+            # centroid for tris
             x_centr[mask] = self.nodes.coords[elnode[mask, :3], 0].mean(axis=1)
             y_centr[mask] = self.nodes.coords[elnode[mask, :3], 1].mean(axis=1)
             dp_centr[mask] = depth[elnode[mask, :3]].mean(axis=1)
 
-            #centroid for quads
+            # centroid for quads
             x_centr[~mask] = self.nodes.coords[elnode[~mask, :], 0].mean(axis=1)
             y_centr[~mask] = self.nodes.coords[elnode[~mask, :], 1].mean(axis=1)
             dp_centr[~mask] = depth[elnode[~mask, :]].mean(axis=1)
@@ -299,21 +298,32 @@ class Elements:
         y = xy[:, 1]
 
         elnode = self.array
-        x1 = x[elnode[:, 0]]; y1 = y[elnode[:, 0]]
-        x2 = x[elnode[:, 1]]; y2 = y[elnode[:, 1]]
-        x3 = x[elnode[:, 2]]; y3 = y[elnode[:, 2]]
+        x1 = x[elnode[:, 0]]
+        y1 = y[elnode[:, 0]]
+        x2 = x[elnode[:, 1]]
+        y2 = y[elnode[:, 1]]
+        x3 = x[elnode[:, 2]]
+        y3 = y[elnode[:, 2]]
         if np.any(elnode.mask):
-            x4 = x[elnode[:, 3]]; y4 = y[elnode[:, 3]]
+            x4 = x[elnode[:, 3]]
+            y4 = y[elnode[:, 3]]
             mask = elnode.mask[:, -1]
-            x4[mask] = x1[mask]; y4[mask] = y1[mask]
+            x4[mask] = x1[mask]
+            y4[mask] = y1[mask]
         else:
-            x4 = x1; y4 = y1
-        area=((x2-x1)*(y3-y1)-(x3-x1)*(y2-y1)+(x3-x1)*(y4-y1)-(x4-x1)*(y3-y1))/2
-      
+            x4 = x1
+            y4 = y1
+        area = (
+            (x2 - x1) * (y3 - y1)
+            - (x3 - x1) * (y2 - y1)
+            + (x3 - x1) * (y4 - y1)
+            - (x4 - x1) * (y3 - y1)
+        ) / 2
+
         return area
-        
+
         ##self.gdf method is very slow
-        #if self.nodes.crs.is_geographic:
+        # if self.nodes.crs.is_geographic:
         #    elements = []
         #    for row in self.gdf.itertuples():
         #        aeqd = CRS.from_user_input(
@@ -325,7 +335,7 @@ class Elements:
         #        ).transform
         #        elements.append(ops.transform(current_to_aeqd, row.geometry))
         #    return [element.area for element in elements]
-        #else:
+        # else:
         #    return [row.geometry.area for row in self.gdf.itertuples()]
 
     def get_triangulation_mask(self, element_mask):
@@ -347,7 +357,6 @@ class Elements:
                     triangulation_mask.append(False)
 
         return np.array(triangulation_mask)
-
 
     @property
     def array(self):

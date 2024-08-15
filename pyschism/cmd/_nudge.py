@@ -8,8 +8,6 @@ from pyschism.forcing.bctides.nudge import Nudge
 from pyschism.forcing.baroclinic import GOFS, RTOFS
 from pyschism.mesh import Hgrid, Vgrid
 
-logger = logging.getLogger(__name__)
-
 
 class NudgeCli:
     def __init__(self, args: argparse.Namespace):
@@ -19,9 +17,9 @@ class NudgeCli:
         }[args.baroclinic_database]()
         nudge = Nudge(args.hgrid, rlmax=args.rlmax, rnu_day=args.rnu_day)
         temp = nudge(data_source.temperature, args.vgrid)
-        temp.write('TEM_nudge.gr3')
+        temp.write("TEM_nudge.gr3")
         salt = nudge(data_source.salinity, args.vgrid)
-        salt.write('SAL_nudge.gr3')
+        salt.write("SAL_nudge.gr3")
 
 
 def add_nudge(subparsers):
@@ -34,18 +32,15 @@ def add_nudge(subparsers):
         "vgrid",
         action=VgridAction,
     )
+    nudge.add_argument("--hgrid-crs", action=HgridCrsAction)
+    nudge.add_argument("--rlmax", type=float, default=1.5)
+    nudge.add_argument("--rnu_day", type=float, default=0.25)
     nudge.add_argument(
-        "--hgrid-crs",
-        action=HgridCrsAction
-    )
-    nudge.add_argument('--rlmax', type=float, default=1.5)
-    nudge.add_argument('--rnu_day', type=float, default=0.25)
-    nudge.add_argument(
-        '--hycom',
-        '--baroclinic-database',
-        choices=['rtofs', 'gofs'],
-        dest='baroclinic_database',
-        default='gofs',
+        "--hycom",
+        "--baroclinic-database",
+        choices=["rtofs", "gofs"],
+        dest="baroclinic_database",
+        default="gofs",
     )
     nudge.add_argument(
         "--log-level",

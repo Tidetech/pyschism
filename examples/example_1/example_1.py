@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 import pathlib
 from datetime import datetime, timedelta, timezone
-import logging
 
 from pyschism.mesh import Hgrid, Vgrid, Fgrid
 from pyschism import ModelDomain, ModelDriver, Stations
@@ -10,19 +9,17 @@ from pyschism.forcing.atmosphere.nws.nws2 import NWS2
 from pyschism.forcing.atmosphere.gfs import GlobalForecastSystem as GFS
 from pyschism.forcing.atmosphere.hrrr import HRRR
 
+
 # https://eev.ee/blog/2012/05/23/python-faq-descriptors/
 
 PARENT = pathlib.Path(__file__).parent
 
-logging.basicConfig(level=logging.INFO)
 
-_logger = logging.getLogger(__name__)
+if __name__ == "__main__":
 
-if __name__ == '__main__':
-
-    hgrid = Hgrid.open(PARENT / 'hgrid.gr3', crs='EPSG:4326')
+    hgrid = Hgrid.open(PARENT / "hgrid.gr3", crs="EPSG:4326")
     vgrid = Vgrid()
-    fgrid = Fgrid.open(PARENT / 'manning.gr3', crs='EPSG:4326')
+    fgrid = Fgrid.open(PARENT / "manning.gr3", crs="EPSG:4326")
 
     # setup model domain
     domain = ModelDomain(hgrid, vgrid, fgrid)
@@ -38,12 +35,12 @@ if __name__ == '__main__':
 
     # Use int or float for seconds, or timedelta objects for pythonic
     # specifications
-    dt = timedelta(seconds=150.)
-    rnday = timedelta(days=30.)
+    dt = timedelta(seconds=150.0)
+    rnday = timedelta(days=30.0)
 
     # Use an integer for number of steps or a timedelta to approximate
     # number of steps internally based on timestep
-    nspool = timedelta(minutes=30.)
+    nspool = timedelta(minutes=30.0)
 
     # The dramp and start_date are optional parameters.
     # start_date is required when using forcings that
@@ -52,17 +49,13 @@ if __name__ == '__main__':
     # date is provided, the driver will throw an exception.
     # tzinfo is optional, UTC assumed if not provided
     dramp = 0.1 * rnday
-    start_date = datetime(2017, 9, 18, 4, 0,
-                          tzinfo=timezone(timedelta(hours=-4))
-                          ) - dramp
+    start_date = (
+        datetime(2017, 9, 18, 4, 0, tzinfo=timezone(timedelta(hours=-4))) - dramp
+    )
 
     # Now we add station outputs
     stations = Stations.from_file(
-        PARENT / 'station.in',
-        timedelta(minutes=6.),
-        elev=True,
-        u=True,
-        v=True
+        PARENT / "station.in", timedelta(minutes=6.0), elev=True, u=True, v=True
     )
 
     # init the model driver
@@ -84,5 +77,5 @@ if __name__ == '__main__':
     driver.param.schout.dahv = True
 
     # write files to disk
-    outdir = pathlib.Path('staging')
+    outdir = pathlib.Path("staging")
     driver.write(outdir, overwrite=True)
